@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+test {
+    ignoreFailures = true
+    useTestNG() {
+        useDefaultListeners = true
+    }
+}
+
+dependencies {
+    testCompile group: 'io.rest-assured', name: 'rest-assured', version: '4.3.3'
+    testCompile group: 'org.testng', name: 'testng', version: '7.3.0'
+}

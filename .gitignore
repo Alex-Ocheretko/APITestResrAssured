@@ -1,0 +1,8 @@
+$APITest
+
+.gradle
+*.idea
+build
+target
+*.iml
+
