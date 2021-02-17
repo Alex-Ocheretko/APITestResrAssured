@@ -4,6 +4,7 @@ import io.restassured.parsing.Parser;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import org.testng.annotations.*;
+import pageObject.GoogleSearchPage;
 
 import java.util.*;
 
@@ -11,17 +12,30 @@ import static io.restassured.RestAssured.given;
 
 public class Test1 {
 
+    DriverWrapper driverWrapper;
+    GoogleSearchPage googleSearchPage;
+
     @Test
     public void get100RandomUser() {
 
+        int numberOfFemale = 0;
+        int numberOfMale = 0;
+
         Response response = doGetRequest("https://randomuser.me/api/?inc=gender,nat,name&exc=nat&results=100");
         JsonPath path = response.jsonPath();
-        List<HashMap<String, Map<String, Object>>> results = path.getList("results");
+        List<HashMap<String, Object>> results = path.getList("results");
 
-        for (HashMap<String, Map<String, Object>> singleObject : results) {
-            Map<String, Object> name = singleObject.get("name");
+        for (HashMap<String, Object> singleObject : results) {
+            Map<String, Object> name = (Map<String, Object>) singleObject.get("name");
             System.out.println(name.get("first") + " " + name.get("last"));
+            if ("female".equals(singleObject.get("gender"))) {
+                numberOfFemale += 1;
+            }
+            if ("male".equals(singleObject.get("gender"))) {
+                numberOfMale += 1;
+            }
         }
+        System.out.println("Female: " + numberOfFemale + " Male: " + numberOfMale);
     }
 
     public static Response doGetRequest(String endpoint) {
@@ -32,6 +46,4 @@ public class Test1 {
                         when().get(endpoint).
                         then().contentType(ContentType.JSON).extract().response();
     }
-
-
 }
