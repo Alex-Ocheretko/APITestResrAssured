@@ -5,9 +5,10 @@ import io.restassured.http.ContentType;
 import io.restassured.parsing.Parser;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
+import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import test.pageObject.DriverWrapper;
+import test.pageObject.FBPageObject;
 import test.pageObject.GoogleSearchPage;
 
 import java.io.File;
@@ -20,10 +21,9 @@ import static io.restassured.RestAssured.given;
 
 public class Test1 {
 
-//    DriverWrapper driverWrapper = new DriverWrapper();
-
-    GoogleSearchPage googleSearchPage;
-
+    final DriverWrapper driverWrapper = new DriverWrapper();
+    GoogleSearchPage googleSearchPage = new GoogleSearchPage(driverWrapper.getDriver());
+    FBPageObject fbPageObject = new FBPageObject(driverWrapper.getDriver());
 
     @Test
     public void get100RandomUsers() {
@@ -67,14 +67,16 @@ public class Test1 {
     }
 
 
-//    @Test
-//    void searchUsersInFB() {
-//        driverWrapper.init();
-//        googleSearchPage.clickOnSearchLine();
-//        googleSearchPage.searchInGoogle("Kolya FB");
-//        driverWrapper.close();
-//        Assert.assertEquals(1,1);
-//    }
+    @Test
+    void searchUsersInFB() {
+        Boolean result = false;
+        String name = "Kolya";
+        driverWrapper.init();
+        googleSearchPage.clickOnSearchLine();
+        googleSearchPage.searchInGoogle(name +" FB");
+
+        driverWrapper.close();
+    }
 
     public static Response doGetRequest(String endpoint) {
         RestAssured.defaultParser = Parser.JSON;
