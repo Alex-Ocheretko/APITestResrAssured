@@ -5,15 +5,14 @@ import io.restassured.http.ContentType;
 import io.restassured.parsing.Parser;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
-import org.openqa.selenium.WebElement;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import test.pageObject.FBPageObject;
+import test.pageObject.FBPage;
 import test.pageObject.GoogleSearchPage;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.*;
 
 
@@ -23,7 +22,12 @@ public class Test1 {
 
     final DriverWrapper driverWrapper = new DriverWrapper();
     GoogleSearchPage googleSearchPage = new GoogleSearchPage(driverWrapper.getDriver());
-    FBPageObject fbPageObject = new FBPageObject(driverWrapper.getDriver());
+    FBPage fbPage = new FBPage(driverWrapper.getDriver());
+
+    @AfterClass
+    public void closeBrowser() {
+        driverWrapper.close();
+    }
 
     @Test
     public void get100RandomUsers() {
@@ -67,16 +71,40 @@ public class Test1 {
     }
 
 
-    @Test
-    void searchUsersInFB() {
-        Boolean result = false;
-        String name = "Kolya";
+    @Test(dataProvider = "Data")
+    void searchUsersInFB(String firstName, String lastName) {
         driverWrapper.init();
         googleSearchPage.clickOnSearchLine();
-        googleSearchPage.searchInGoogle(name +" FB");
-
-        driverWrapper.close();
+        googleSearchPage.searchInGoogle(firstName+ " " + lastName +" | Facebook");
+        googleSearchPage.clickOnFirstLink();
+        if (fbPage.firstUserVisibility()) {
+            fbPage.firstUserClick();
+        }
+        Assert.assertEquals(fbPage.getUserName(), firstName+ " " + lastName);
     }
+
+    @DataProvider(name = "Data")
+            public Iterator<Object []> dataReader() throws InterruptedException {
+            List<Object []> dataLines = new ArrayList<>();
+            boolean notDataHeader = false;
+            String[] data;
+            BufferedReader br;
+            String line;
+            String filePath = System.getProperty("user.dir") + "/src/main/resources/test.csv";
+
+            try {
+            br = new BufferedReader(new FileReader(filePath));
+            while ((line = br.readLine()) != null) {
+            data = line.split(",");
+            if (notDataHeader) dataLines.add(data);
+            notDataHeader = true;
+            }
+            } catch (Exception e) {
+        e.printStackTrace();
+    }
+        return dataLines.iterator();
+}
+
 
     public static Response doGetRequest(String endpoint) {
         RestAssured.defaultParser = Parser.JSON;

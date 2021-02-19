@@ -6,8 +6,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
-import java.util.List;
-
 public class GoogleSearchPage {
 
     public GoogleSearchPage(WebDriver driver) {
@@ -17,8 +15,8 @@ public class GoogleSearchPage {
     @FindBy(name = "q")
     private WebElement searchLine;
 
-    @FindBy(className = "g")
-    private List<WebElement> links;
+    @FindBy(css = "div[class='hlcw0c']>div h3")
+    private WebElement firstLink;
 
     public void searchInGoogle(String name) {
         searchLine.sendKeys(name);
@@ -29,7 +27,7 @@ public class GoogleSearchPage {
         searchLine.click();
     }
 
-    public List<WebElement> getLinks(){
-        return links;
+    public void clickOnFirstLink() {
+        firstLink.click();
     }
 }
